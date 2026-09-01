@@ -9,8 +9,23 @@
 - Migrasi Alembic khusus tabel master — **`version_table` sendiri**, dijalankan **satu runner**
   (agar tak balapan antar sistem di DB yang sama).
 
-## Prinsip
-- Master (mis. `Supplier`/`Pelanggan`) = cermin master resmi; `Pelanggan` disinkron dari Kledo.
-- Domain (batch, giling, SOP, approval, dst.) **BUKAN** di sini — itu milik repo masing-masing.
+## Status
+- ✅ Paket `hmu_core` dibangun: `Base`, `TimestampMixin`, 6 model master (diekstrak setia dari
+  `app/models/master.py`). Import: `from hmu_core import User, Supplier, Pelanggan, Warehouse, Silo, Dryer`.
+- ✅ Alembic core: `version_table = alembic_version_core` (terpisah dari produksi/kantor), baseline
+  `0001_baseline_master`.
+- ⏳ Belum: dijadikan **git submodule** di produksi/kantor/timbangan; belum di-`stamp` ke DB live.
 
-> Kosong sekarang. Diisi bertahap sesuai cetak-biru. Kode live masih di `../app` sampai migrasi.
+## Cara pakai (nanti)
+```bash
+pip install -e ./core                      # atau tambahkan sebagai git submodule
+# DB LIVE (tabel master sudah ada) — cukup tandai, JANGAN upgrade:
+cd core && DATABASE_URL=... alembic -c alembic.ini stamp 0001_baseline_master
+```
+
+## Prinsip
+- Master (`Supplier`/`Pelanggan`) = cermin master resmi; `Pelanggan` disinkron dari Kledo.
+- Domain (batch, giling, SOP, approval, dst.) **BUKAN** di sini — milik repo masing-masing.
+- Skema HARUS identik dengan DB live — verifikasi sebelum `stamp`/deploy.
+
+> Kode live masih di `../app` sampai migrasi Fase A selesai. Ini fondasi yang dipakai semua repo.

@@ -1,0 +1,19 @@
+[project]
+name = "hmu-core"
+version = "0.1.0"
+description = "Skema master bersama Hadi Mulya (produksi, kantor, timbangan): User, Supplier, Pelanggan, Warehouse, Silo, Dryer."
+requires-python = ">=3.11"
+dependencies = [
+    "SQLAlchemy>=2.0",
+]
+
+[project.optional-dependencies]
+# Hanya perlu di sistem yang MENJALANKAN migrasi core (satu runner).
+migrate = ["alembic>=1.13"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["hmu_core"]
