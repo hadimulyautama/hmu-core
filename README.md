@@ -23,6 +23,15 @@ pip install -e ./core                      # atau tambahkan sebagai git submodul
 cd core && DATABASE_URL=... alembic -c alembic.ini stamp 0001_baseline_master
 ```
 
+## Validasi vs DB live (2026-09-01, read-only)
+Ke-6 tabel ada; **semua kolom cocok nama & tipe; server-default cocok.** Satu-satunya beda:
+`status`/`access_level`/`wa_broadcast_opt_in` di **4 tabel lama** (`suppliers`, `users`, `silos`,
+`dryers`) **NULLABLE** di DB, padahal model (benar) = NOT NULL. `pelanggan` (tabel baru) sudah
+NOT NULL. Ini **drift legacy** — dikonfirmasi **0 baris NULL** (dari 181 supplier, dst.), jadi
+**aman**: model `core` sengaja dijaga NOT NULL (skema yang benar). Opsional nanti: migrasi core
+`0002` `ALTER COLUMN ... SET NOT NULL` untuk merapikan 4 tabel lama (pasti sukses, tak ada NULL).
+`alembic stamp 0001` di DB live tetap valid.
+
 ## Prinsip
 - Master (`Supplier`/`Pelanggan`) = cermin master resmi; `Pelanggan` disinkron dari Kledo.
 - Domain (batch, giling, SOP, approval, dst.) **BUKAN** di sini — milik repo masing-masing.
