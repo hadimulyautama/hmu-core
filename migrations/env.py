@@ -44,11 +44,35 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 
+#: Tabel MASTER — satu-satunya yang dimiliki chain ini.
+#:
+#: Tanpa saringan, `alembic check` di sini mengusulkan DROP 71 tabel, termasuk
+#: seluruh tabel pabrik, seluruh tabel kantor & timbangan, dan `alembic_version`
+#: itu sendiri. Bukan karena ada yang salah, melainkan karena metadata core
+#: hanya memuat tabel master sementara databasenya memuat semuanya — dan
+#: "tidak ada di metadata" dibaca alembic sebagai "harus dihapus".
+#: Temuan QA X-12.
+TABEL_MASTER = frozenset({
+    "users", "suppliers", "warehouses", "pelanggan", "silos", "dryers",
+})
+
+
+def include_object(object_, name, type_, reflected, compare_to) -> bool:
+    """Hanya tabel master yang diurus chain ini."""
+    if type_ == "table":
+        return (name or "") in TABEL_MASTER
+    parent = getattr(object_, "table", None)
+    if parent is not None and parent.name:
+        return parent.name in TABEL_MASTER
+    return True
+
+
 def do_run_migrations(connection) -> None:
     context.configure(
         connection=connection,
         target_metadata=target_metadata,
         version_table=VERSION_TABLE,
+        include_object=include_object,
         compare_type=True,
     )
     with context.begin_transaction():
