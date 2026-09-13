@@ -1,7 +1,25 @@
 # core — lapisan inti/master bersama
 
-**Peran:** satu sumber kebenaran skema **master** yang dipakai SEMUA sistem
-(Kantor, Produksi, Timbangan) sebagai **git submodule**.
+**Peran:** satu sumber kebenaran skema **master** (`hmu_core`) dan
+**identitas** (`hmu_identitas`) yang dipakai SEMUA sistem.
+
+## `hmu_identitas` — satu orang, satu akun, satu sesi, satu saklar (Tahap 2, 13 Sep 2026)
+
+Dipakai produksi, timbangan, gudang2, meja, kantor. Di-vendor utuh oleh
+`scripts/sinkron.py` (`--core` ikut menyalin `hmu_core`), dijaga
+`MANIFEST.sha256` + uji `tests/test_identitas_paket.py` di tiap repo.
+
+| Modul | Isi | Butuh SQLAlchemy |
+|---|---|---|
+| `peran` | tangga operator·admin·superadmin, `TINGKAT`, `terlalu_tinggi`, lingkup gudang, view, pemetaan peran timbangan | tidak |
+| `pintu` | `boleh_masuk(peran, aplikasi, lingkup)` — tabel pintu per aplikasi (keputusan pemilik) | tidak |
+| `sandi`, `token` | scrypt & token HMAC berversi — bentuk sama untuk semua app, kunci per app | tidak |
+| `model` | `Akun` = tabel `produksi_akun` (nama tabel tak diganti; chain migrasi masih produksi) | ya |
+| `masuk` | `periksa_kredensial`, `akun_aktif` (pintu tiap permintaan), `naikkan_versi`, `ganti_sandi`, `nonaktifkan` (SATU saklar), `ada_superadmin_aktif` | ya |
+| `penjaga` | manifest, pemeriksa AST "peran harfiah", "definisi ganda" | tidak |
+
+Uji: `../produksi/.venv/bin/python -m pytest -q tests` (murni) dan dengan
+`UJI_PG_URL=postgresql+asyncpg://…/uji_identitas` untuk `tests/pg`.
 
 ## Isi (rencana)
 - Model master: `User`, `Warehouse`, `Supplier`, `Pelanggan`, `Silo`, `Dryer`, `Heartbeat`
