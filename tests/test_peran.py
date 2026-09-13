@@ -66,3 +66,13 @@ def test_pemetaan_peran_timbangan_bolak_balik():
 def test_daftar_yang_ditawarkan_tanpa_nama_lama():
     assert [k for k, _ in P.PILIHAN] == [P.OPERATOR, P.ADMIN, P.SUPERADMIN]
     assert P.LABEL[P.SUPERADMIN] == "Super Admin"
+
+
+def test_operator_boleh_ganti_gudang_tapi_tak_menyamar_peran():
+    """Pemilik 13 Sep: operator saling menggantikan antar gudang."""
+    assert P.boleh_ganti_gudang(P.OPERATOR) and P.boleh_ganti_gudang(P.ADMIN)
+    assert not P.boleh_ganti_gudang("") and not P.boleh_ganti_gudang("dewa")
+    assert not P.boleh_menyamar(P.OPERATOR)
+    assert [k for k, _ in P.PILIHAN_GUDANG] == [f"{P.OPERATOR}:{P.G1}", f"{P.OPERATOR}:{P.G2}"]
+    # Berpindah gudang tak mengubah peran: operator tetap operator.
+    assert P.peran_efektif(P.OPERATOR, f"{P.OPERATOR}:{P.G2}") == P.OPERATOR

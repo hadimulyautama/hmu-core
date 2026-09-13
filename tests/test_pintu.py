@@ -25,9 +25,11 @@ def test_admin_hanya_meja_timbangan_kantor_dan_pos_produksi():
 
 
 def test_operator_hanya_aplikasi_operator_dan_timbangan():
+    """Operator saling menggantikan (pemilik 13 Sep): gudang utamanya bukan
+    pagar — operator Gudang 1 boleh masuk aplikasi Gudang 2, dan sebaliknya."""
     assert pintu.boleh_masuk(P.OPERATOR, pintu.GUDANG2, lingkup=P.G2)
-    assert not pintu.boleh_masuk(P.OPERATOR, pintu.GUDANG2, lingkup=P.G1)
-    assert not pintu.boleh_masuk(P.OPERATOR, pintu.GUDANG2, lingkup=P.TANPA)
+    assert pintu.boleh_masuk(P.OPERATOR, pintu.GUDANG2, lingkup=P.G1)
+    assert pintu.boleh_masuk(P.OPERATOR, pintu.GUDANG2, lingkup=P.TANPA)
     assert pintu.boleh_masuk(P.OPERATOR, pintu.PRODUKSI, lingkup=P.G1)
     assert pintu.boleh_masuk(P.OPERATOR, pintu.TIMBANGAN)
     assert not pintu.boleh_masuk(P.OPERATOR, pintu.MEJA)
@@ -40,5 +42,4 @@ def test_peran_tak_dikenal_ditolak_dan_pesannya_menyebut_aplikasi():
     pesan = pintu.sebab_tolak(P.OPERATOR, pintu.MEJA)
     assert pesan and "operator" in pesan.lower()
     assert pintu.sebab_tolak(P.ADMIN, pintu.MEJA) is None
-    pesan_g2 = pintu.sebab_tolak(P.OPERATOR, pintu.GUDANG2, lingkup=P.G1)
-    assert pesan_g2 and "Gudang 2" in pesan_g2
+    assert pintu.sebab_tolak(P.OPERATOR, pintu.GUDANG2, lingkup=P.G1) is None
