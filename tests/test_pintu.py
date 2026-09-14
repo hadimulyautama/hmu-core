@@ -17,7 +17,8 @@ def test_superadmin_masuk_semua():
 
 def test_admin_hanya_meja_timbangan_kantor_dan_pos_produksi():
     assert pintu.boleh_masuk(P.ADMIN, pintu.MEJA)
-    assert pintu.boleh_masuk("staff", pintu.MEJA)
+    assert not pintu.boleh_masuk("staff", pintu.MEJA)
+    assert "dipensiunkan" in pintu.sebab_tolak("staff", pintu.MEJA)
     assert pintu.boleh_masuk(P.ADMIN, pintu.TIMBANGAN)
     assert pintu.boleh_masuk(P.ADMIN, pintu.KANTOR)
     assert pintu.boleh_masuk(P.ADMIN, pintu.PRODUKSI)
