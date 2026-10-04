@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 """Vendor paket bersama ke repo aplikasi, lalu tulis manifest-nya.
 
-    python scripts/sinkron.py ../produksi ../timbangan ../meja ../gudang2 ../kantor
-    python scripts/sinkron.py --core ../produksi ../timbangan   # ikut hmu_core
+    python scripts/sinkron.py ../produksi ../timbangan ../kantor
+    python scripts/sinkron.py --core ../produksi ../timbangan ../kantor   # ikut hmu_core
 
-`hmu_identitas` selalu disalin. `hmu_core` hanya dengan `--core` — kantor
-memuatnya dari submodule `core/`, jadi tak boleh punya salinan kedua.
+`hmu_identitas` selalu disalin. `hmu_core` hanya dengan `--core`.
+
+Kantor dulu memuat `hmu_core` dari submodule `core/`, tapi submodule itu
+DIBUANG 13 September 2026 malam (build GitHub di Railway tidak membawa isi
+submodule, deploy gagal di `COPY core/hmu_core`) — sejak itu kantor
+memvendor `hmu_core` persis seperti produksi dan timbangan, lewat skrip ini
+dengan `--core`. Lupa menyertakan kantor berarti salinannya diam-diam
+tertinggal dari produksi/timbangan (begitulah `kledo_kontak.py` bisa
+berbeda aturan `type_id` di satu sistem tanpa disadari) — ikut sertakan
+kantor setiap kali memakai `--core`.
 Folder tujuan DIGANTI utuh, supaya tak ada salinan yang "hampir sama".
 """
 from __future__ import annotations
