@@ -43,6 +43,22 @@ def test_kontrak_proses_bisa_dipertukarkan_antar_aplikasi():
     assert salinan == proses
 
 
+def test_kontrak_bisa_dipetakan_ke_baris_basis_data_bersama():
+    proses = ProsesOperasional(
+        aplikasi="produksi", id=12, kode="POL-20261012-01",
+        jenis=JenisProses.PENYOSOHAN, status=StatusProses.BERJALAN,
+        pemilik=PemilikProses(JenisPemilik.PABRIK),
+        bahan=(ArusProses(buat_produk("beras_pk"), Decimal("500"), "Silo A", 3),),
+    )
+
+    baris = proses.ke_entitas(tabel_sumber="polishing_process", id_sumber=12)
+    assert baris.kode == "POL-20261012-01"
+    assert baris.jenis_pemilik == "pabrik"
+    assert baris.arus[0].arah == "bahan"
+    assert baris.arus[0].komoditas == "beras_pk"
+    assert float(baris.arus[0].berat_kg) == 500
+
+
 def test_pemilik_jasa_memerlukan_identitas():
     with pytest.raises(ValueError, match="harus memiliki id"):
         PemilikProses(JenisPemilik.JASA)
