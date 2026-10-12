@@ -59,9 +59,18 @@ def test_kontrak_bisa_dipetakan_ke_baris_basis_data_bersama():
     assert float(baris.arus[0].berat_kg) == 500
 
 
-def test_pemilik_jasa_memerlukan_identitas():
-    with pytest.raises(ValueError, match="harus memiliki id"):
+def test_pemilik_jasa_memerlukan_id_atau_nama():
+    with pytest.raises(ValueError, match="harus memiliki id atau nama"):
         PemilikProses(JenisPemilik.JASA)
+
+
+def test_pemilik_pelanggan_bisa_dicatat_dengan_nama_sementara():
+    """Pelanggan yang belum tersinkron ke daftar master tetap punya jejak."""
+    pemilik = PemilikProses(
+        JenisPemilik.PELANGGAN, nama="Pelanggan baru di pos timbang",
+    )
+    assert pemilik.id is None
+    assert pemilik.nama == "Pelanggan baru di pos timbang"
 
 
 def test_waktu_proses_tidak_boleh_terbalik():
